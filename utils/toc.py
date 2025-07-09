@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import List
 
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 import fitz  # type: ignore
 
 __all__ = [

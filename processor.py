@@ -209,8 +209,8 @@ def preprocess(
             skip_rects = diag_rects + (hdr_r + ftr_r if strip_headers_footers else [])
 
             # ——— text extraction ————————————————————————————
-            if preserve_layout:
-                page_text = page.get_text("text")  # Raw layout-preserved output
+            if not preserve_layout:
+                content = page.get_text("text")  # Raw layout-preserved output
             else:
                 if markdown:
                     content = "\n".join(
@@ -253,12 +253,20 @@ def preprocess(
     # ——— return value ————————————————————————————————
     if as_dataset:
         try:
-            from datasets import Dataset  # type: ignore
+            from datasets import Dataset, DatasetDict  # type: ignore
         except ImportError as e:
             raise RuntimeError("as_dataset=True but the 'datasets' package is missing.  pip install datasets") from e
-        return Dataset.from_list(dataset_rows)
-    return dict(legacy)
 
+        grouped = defaultdict(list)
+        for row in dataset_rows:
+            grouped[row["document_name"]].append(row)
+
+        return DatasetDict({
+            doc_name: Dataset.from_list(pages)
+            for doc_name, pages in grouped.items()
+        })
+    else:
+        return dict(legacy)
 
 # Backward compatibility alias
 process_documents = preprocess

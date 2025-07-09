@@ -5,7 +5,7 @@ from typing import Dict, List
 
 import fitz  # type: ignore
 import re
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 
 __all__ = ["normalize", "extract_headers_and_footers"]
 
